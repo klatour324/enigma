@@ -64,7 +64,7 @@ class Cipher
     Hash[encryption: encrypted_message, key: key, date: date]
   end
 
-  def decrypt(encrypted_message, key, date)
+  def decrypt(encrypted_message, key, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts

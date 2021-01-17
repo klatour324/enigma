@@ -80,4 +80,17 @@ class CipherTest < Minitest::Test
 
     assert_equal expected, cipher.encrypt('hello world', '02715')
   end
+
+  def test_it_decrypts_a_message_using_todays_date
+    cipher = Cipher.new
+    time = Time.stubs(:now).returns(Time.parse('2021-01-17'))
+
+    expected = {
+                decryption: 'hello world',
+                key: '02715',
+                date: '170121'
+               }
+
+    assert_equal expected, cipher.decrypt('nkfaufqdxry', '02715')
+  end
 end
