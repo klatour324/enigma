@@ -50,7 +50,6 @@ class Cipher
 
   def key_generator
     rand(9999).to_s.rjust(5, '0')
-    # require "pry"; binding.pry
   end
 
   def encrypt(message, key = key_generator, date = Time.now.strftime('%d%m%y'))

@@ -83,7 +83,7 @@ class CipherTest < Minitest::Test
 
   def test_it_decrypts_a_message_using_todays_date
     cipher = Cipher.new
-    
+
     Time.stubs(:now).returns(Time.parse('2021-01-17'))
 
     expected = {
