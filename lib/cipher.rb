@@ -1,3 +1,5 @@
+require 'time'
+
 class Cipher
   ALPHABET = ('a'..'z').to_a << ' '
 
@@ -46,12 +48,16 @@ class Cipher
     @offset = ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
-  def encrypt(message, key, date)
+  def key_generator
+    rand(9999).to_s.rjust(5, '0')
+  end
+
+  def encrypt(message, key = key_generator, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts
 
-    encrypted_message = message.downcase.split('').each_with_index.reduce("") do |memo, (char, index)|
+    encrypted_message = message.downcase.split('').each_with_index.reduce('') do |memo, (char, index)|
       shift_index = index % make_shifts.length
       shift = make_shifts[shift_index]
       character_index = ALPHABET.index(char)
@@ -62,7 +68,7 @@ class Cipher
     Hash[encryption: encrypted_message, key: key, date: date]
   end
 
-  def decrypt(encrypted_message, key, date)
+  def decrypt(encrypted_message, key, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts
