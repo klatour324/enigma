@@ -1,9 +1,12 @@
 class Cipher
   ALPHABET = ('a'..'z').to_a << ' '
-  
+
+  def make_offset(date)
+    ((date.to_i) ** 2).to_s.split('').last(4)
+  end
+
   def encrypt(message, key, date)
-   offset_conversion = ((date.to_i) ** 2).to_s
-   offset = offset_conversion.split('').last(4)
+   offset = make_offset(date)
 
    split_key = key.split('')
    a_key = split_key[0] + split_key[1]
