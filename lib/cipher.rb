@@ -52,18 +52,14 @@ class Cipher
     make_shifts
 
     encrypted_message = message.downcase.split('').each_with_index.reduce("") do |memo, (char, index)|
-      shift_index = index % shifts.length
-      shift = shifts[shift_index]
+      shift_index = index % make_shifts.length
+      shift = make_shifts[shift_index]
       character_index = ALPHABET.index(char)
       rotated_alphabet = ALPHABET.rotate(shift)
       new_character = rotated_alphabet[character_index]
       memo += new_character
     end
 
-    {
-      encryption: encrypted_message,
-      key: key,
-      date: date
-    }
+    Hash[encryption: encrypted_message, key: key, date: date]
   end
 end
