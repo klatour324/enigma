@@ -55,4 +55,16 @@ class CipherTest < Minitest::Test
     assert_equal 73, cipher.c_shift
     assert_equal 20, cipher.d_shift
   end
+
+  def test_it_can_decrypt_a_message_with_given_key_and_date
+    cipher = Cipher.new
+
+    expected = {
+                decryption: "hello world",
+                key: "02715",
+                date: "040895"
+               }
+
+    assert_equal expected, cipher.decrypt("keder ohulw", "02715", "040895")
+  end
 end
