@@ -39,20 +39,20 @@ class CipherTest < Minitest::Test
     assert_equal 15, cipher.d_key
   end
 
-  # def test_it_can_make_shifts
-  #   cipher = Cipher.new
-  #   a_shift = 3
-  #   b_shift = 27
-  #   c_shift = 73
-  #   d_shift = 20
-  #
-  #   cipher.create_offset('040895')
-  #   cipher.create_keys('02715')
-  #   cipher.make_shifts
-  #
-  #   assert_equal 3, cipher.a_shift
-  #   assert_equal 27, cipher.b_shift
-  #   assert_equal 73, cipher.c_shift
-  #   assert_equal 20, cipher.d_shift
-  # end
+  def test_it_can_make_shifts
+    cipher = Cipher.new
+    a_shift = 3
+    b_shift = 27
+    c_shift = 73
+    d_shift = 20
+
+    cipher.create_offset('040895')
+    cipher.create_keys('02715')
+    cipher.make_shifts
+
+    assert_equal 3, cipher.a_shift
+    assert_equal 27, cipher.b_shift
+    assert_equal 73, cipher.c_shift
+    assert_equal 20, cipher.d_shift
+  end
 end
