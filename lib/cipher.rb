@@ -16,10 +16,10 @@ class Cipher
   def create_keys(key)
     split_key = key.split('')
 
-    @a_key = split_key[0] + split_key[1]
-    @b_key = split_key[1] + split_key[2]
-    @c_key = split_key[2] + split_key[3]
-    @d_key = split_key[3] + split_key[4]
+    @a_key = (split_key[0] + split_key[1]).to_i
+    @b_key = (split_key[1] + split_key[2]).to_i
+    @c_key = (split_key[2] + split_key[3]).to_i
+    @d_key = (split_key[3] + split_key[4]).to_i
   end
 
   def create_offset(date)
@@ -30,10 +30,10 @@ class Cipher
    offset = create_offset(date)
    create_keys(key)
 
-   a_shift = (a_key.to_i) + (offset[0].to_i)
-   b_shift = b_key.to_i + offset[1].to_i
-   c_shift = c_key.to_i + offset[2].to_i
-   d_shift = d_key.to_i + offset[3].to_i
+   a_shift = a_key + offset[0].to_i
+   b_shift = b_key + offset[1].to_i
+   c_shift = c_key + offset[2].to_i
+   d_shift = d_key + offset[3].to_i
 
 
    shifts = [a_shift, b_shift, c_shift, d_shift]

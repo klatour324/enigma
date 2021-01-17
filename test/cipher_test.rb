@@ -31,9 +31,9 @@ class CipherTest < Minitest::Test
 
     cipher.create_keys('02715')
 
-    assert_equal '02', cipher.a_key
-    assert_equal '27', cipher.b_key
-    assert_equal '71', cipher.c_key
-    assert_equal '15', cipher.d_key
+    assert_equal 2, cipher.a_key
+    assert_equal 27, cipher.b_key
+    assert_equal 71, cipher.c_key
+    assert_equal 15, cipher.d_key
   end
 end
