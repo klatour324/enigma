@@ -1,18 +1,34 @@
 class Cipher
   ALPHABET = ('a'..'z').to_a << ' '
 
+  attr_reader :a_key,
+              :b_key,
+              :c_key,
+              :d_key
+
+  def initialize
+    @a_key = nil
+    @b_key = nil
+    @c_key = nil
+    @d_key = nil
+  end
+
+  def create_keys(key)
+    split_key = key.split('')
+
+    @a_key = split_key[0] + split_key[1]
+    @b_key = split_key[1] + split_key[2]
+    @c_key = split_key[2] + split_key[3]
+    @d_key = split_key[3] + split_key[4]
+  end
+
   def create_offset(date)
     ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
   def encrypt(message, key, date)
    offset = create_offset(date)
-
-   split_key = key.split('')
-   a_key = split_key[0] + split_key[1]
-   b_key = split_key[1] + split_key[2]
-   c_key = split_key[2] + split_key[3]
-   d_key = split_key[3] + split_key[4]
+   create_keys(key)
 
    a_shift = (a_key.to_i) + (offset[0].to_i)
    b_shift = b_key.to_i + offset[1].to_i

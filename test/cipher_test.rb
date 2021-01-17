@@ -25,4 +25,15 @@ class CipherTest < Minitest::Test
 
     assert_equal ['4', '7', '2', '1'], cipher.create_offset('180689')
   end
+
+  def test_it_can_create_keys
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+
+    assert_equal '02', cipher.a_key
+    assert_equal '27', cipher.b_key
+    assert_equal '71', cipher.c_key
+    assert_equal '15', cipher.d_key
+  end
 end
