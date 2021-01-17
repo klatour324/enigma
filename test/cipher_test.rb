@@ -19,4 +19,10 @@ class CipherTest < Minitest::Test
 
     assert_equal expected, cipher.encrypt("hello world", "02715", "040895")
   end
+
+  def test_it_can_create_an_offset
+    cipher = Cipher.new
+
+    assert_equal ['4', '7', '2', '1'], cipher.create_offset('180689')
+  end
 end
