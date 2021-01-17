@@ -1,3 +1,5 @@
+require 'time'
+
 class Cipher
   ALPHABET = ('a'..'z').to_a << ' '
 
@@ -46,12 +48,12 @@ class Cipher
     @offset = ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
-  def encrypt(message, key, date)
+  def encrypt(message, key, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts
 
-    encrypted_message = message.downcase.split('').each_with_index.reduce("") do |memo, (char, index)|
+    encrypted_message = message.downcase.split('').each_with_index.reduce('') do |memo, (char, index)|
       shift_index = index % make_shifts.length
       shift = make_shifts[shift_index]
       character_index = ALPHABET.index(char)
