@@ -48,7 +48,12 @@ class Cipher
     @offset = ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
-  def encrypt(message, key, date = Time.now.strftime('%d%m%y'))
+  def key_generator
+    rand(9999).to_s.rjust(5, '0')
+    # require "pry"; binding.pry
+  end
+
+  def encrypt(message, key = key_generator, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts

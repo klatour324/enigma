@@ -70,7 +70,7 @@ class CipherTest < Minitest::Test
 
   def test_it_encrypts_a_message_using_todays_date
     cipher = Cipher.new
-    time = Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    Time.stubs(:now).returns(Time.parse('2021-01-17'))
 
     expected = {
                 encryption: 'nkfaufqdxry',
@@ -83,7 +83,8 @@ class CipherTest < Minitest::Test
 
   def test_it_decrypts_a_message_using_todays_date
     cipher = Cipher.new
-    time = Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    
+    Time.stubs(:now).returns(Time.parse('2021-01-17'))
 
     expected = {
                 decryption: 'hello world',
@@ -92,5 +93,20 @@ class CipherTest < Minitest::Test
                }
 
     assert_equal expected, cipher.decrypt('nkfaufqdxry', '02715')
+  end
+
+  def test_it_generates_a_random_key_and_uses_todays_date
+    cipher = Cipher.new
+
+    Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    cipher.stubs(:rand).returns(1234)
+
+    expected = {
+                encryption: 'mwlttrwwwcd',
+                key: '01234',
+                date: '170121'
+               }
+
+    assert_equal expected, cipher.encrypt('hello world')
   end
 end
