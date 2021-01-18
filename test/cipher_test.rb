@@ -68,6 +68,105 @@ class CipherTest < Minitest::Test
     assert_equal expected, cipher.decrypt('keder ohulw', '02715', '040895')
   end
 
+  def test_it_can_encrypt_messages_with_non_characters
+    cipher = Cipher.new
+
+    expected = {
+      encryption: 'keder ohulw!',
+      key: '02715',
+      date: '040895'
+    }
+
+    assert_equal expected, cipher.encrypt('hello world!', '02715', '040895')
+  end
+
+  def test_it_can_decrypt_messages_with_non_characters
+    cipher = Cipher.new
+
+    expected = {
+      decryption: 'hello world1',
+      key: '02715',
+      date: '040895'
+    }
+
+    assert_equal expected, cipher.decrypt('keder ohulw1', '02715', '040895')
+  end
+
+
+  def test_location_of_char
+    cipher = Cipher.new
+
+    assert_equal 0, cipher.location_of('a')
+  end
+
+  def test_it_can_retrieve_shift
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+    cipher.create_offset('040895')
+
+    assert_equal 27, cipher.retrieve_shift(1, 1)
+    assert_equal -73, cipher.retrieve_shift(2, -1)
+  end
+
+  def test_it_rotates_alphabet
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+    cipher.create_offset('040895')
+
+    assert_equal ["d", "e", "f", "g", "h", "i",
+                  "j", "k", "l","m", "n", "o",
+                  "p", "q", "r", "s", "t", "u",
+                  "v", "w", "x", "y", "z", " ",
+                  "a", "b", "c"], cipher.rotate_alphabet(0, 1)
+
+
+    assert_equal ["y", "z", " ", "a", "b", "c",
+                  "d", "e", "f","g", "h", "i",
+                  "j", "k", "l", "m", "n", "o",
+                  "p", "q", "r", "s", "t", "u",
+                  "v", "w", "x"], cipher.rotate_alphabet(0, -1)
+
+  end
+
+  def test_it_makes_code
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+    cipher.create_offset('040895')
+    cipher.location_of('l')
+    cipher.retrieve_shift(2, 1)
+    cipher.rotate_alphabet(2, 1)
+
+    assert_equal 'keder', cipher.code('hello', 1)
+  end
+
+  def test_it_encodes_when_direction_is_positive
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+    cipher.create_offset('040895')
+    cipher.location_of('t')
+    cipher.retrieve_shift(2, 1)
+    cipher.rotate_alphabet(2, 1)
+
+    assert_equal 'w', cipher.encode('t')
+  end
+
+  def test_it_can_translate_when_direction_is_negative
+    cipher = Cipher.new
+
+    cipher.create_keys('02715')
+    cipher.create_offset('040895')
+    cipher.location_of('a')
+    cipher.retrieve_shift(2, -1)
+    cipher.rotate_alphabet(2, -1)
+
+    assert_equal 'y', cipher.translate('a')
+    assert_equal 'words', cipher.translate('zojxv')
+  end
+
   def test_it_encrypts_a_message_using_todays_date
     cipher = Cipher.new
     Time.stubs(:now).returns(Time.parse('2021-01-17'))
@@ -108,5 +207,20 @@ class CipherTest < Minitest::Test
                }
 
     assert_equal expected, cipher.encrypt('hello world')
+  end
+
+  def test_it_generates_a_key
+    cipher = Cipher.new
+
+    Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    cipher.stubs(:rand).returns(1234)
+
+    expected = {
+                encryption: 'mwlttrwwwcd',
+                key: '01234',
+                date: '170121'
+               }
+
+    assert_equal expected[:key], cipher.key_generator
   end
 end
