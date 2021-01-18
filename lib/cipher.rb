@@ -70,7 +70,7 @@ class Cipher
     create_keys(key)
     make_shifts
 
-    decrypted_message = decode(encrypted_message)
+    decrypted_message = translate(encrypted_message)
 
     {decryption: decrypted_message, key: key, date: date}
   end
@@ -79,7 +79,7 @@ class Cipher
     code(message, 1)
   end
 
-  def decode(encrypted_message)
+  def translate(encrypted_message)
     code(encrypted_message, -1)
   end
 
@@ -87,21 +87,24 @@ class Cipher
     ALPHABET.index(char)
   end
 
-  def shift_index(index, direction)
+  def retrieve_shift(index, direction)
     (make_shifts[index % make_shifts.length]) * direction
   end
 
   def rotate_alphabet(index, direction)
-    ALPHABET.rotate(shift_index(index, direction))
+    ALPHABET.rotate(retrieve_shift(index, direction))
   end
 
   def code(secret_message, direction)
     secret_message.downcase.split('').each_with_index.reduce('') do |memo, (char, index)|
-      shift_index(index, direction)
-      location_of(char)
-      scrambled_alphabet = rotate_alphabet(index, direction)
-      new_character = scrambled_alphabet[location_of(char)]
-      memo += new_character
+      retrieve_shift(index, direction)
+      if location_of(char).nil?
+        memo += char
+      else
+        scrambled_alphabet = rotate_alphabet(index, direction)
+        new_character = scrambled_alphabet[location_of(char)]
+        memo += new_character
+      end
     end
   end
 end
