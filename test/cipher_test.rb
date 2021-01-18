@@ -209,4 +209,18 @@ class CipherTest < Minitest::Test
     assert_equal expected, cipher.encrypt('hello world')
   end
 
+  def test_it_generates_a_key
+    cipher = Cipher.new
+
+    Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    cipher.stubs(:rand).returns(1234)
+
+    expected = {
+                encryption: 'mwlttrwwwcd',
+                key: '01234',
+                date: '170121'
+               }
+
+    assert_equal expected[:key], cipher.key_generator
+  end
 end
