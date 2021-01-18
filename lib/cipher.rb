@@ -1,9 +1,6 @@
 require 'time'
-require './lib/offset'
 
 class Cipher
-  # include Offset
-
   ALPHABET = ('a'..'z').to_a << ' '
 
   attr_reader :a_key,
