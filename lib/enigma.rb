@@ -1,7 +1,11 @@
 require 'time'
+require './lib/key'
+require './lib/alphabet_actions'
 
 class Enigma
-  ALPHABET = ('a'..'z').to_a << ' '
+  include Key
+  include AlphabetActions
+  # ALPHABET = ('a'..'z').to_a << ' '
 
   attr_reader :a_key,
               :b_key,
@@ -27,10 +31,6 @@ class Enigma
     @shifts   = nil
   end
 
-  def key_generator
-    rand(9999).to_s.rjust(5, '0')
-  end
-
   def make_shifts
     @a_shift = a_key + offset[0].to_i
     @b_shift = b_key + offset[1].to_i
@@ -52,7 +52,7 @@ class Enigma
     @offset = ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
-  def encrypt(message, key = key_generator, date = Time.now.strftime('%d%m%y'))
+  def encrypt(message, key = generate_key, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts
@@ -80,16 +80,8 @@ class Enigma
     code(encrypted_message, -1)
   end
 
-  def location_of(char)
-    ALPHABET.index(char)
-  end
-
   def retrieve_shift(index, direction)
     (make_shifts[index % make_shifts.length]) * direction
-  end
-
-  def rotate_alphabet(index, direction)
-    ALPHABET.rotate(retrieve_shift(index, direction))
   end
 
   def code(secret_message, direction)

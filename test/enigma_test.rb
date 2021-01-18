@@ -221,6 +221,6 @@ class EnigmaTest < Minitest::Test
                 date: '170121'
                }
 
-    assert_equal expected[:key], enigma.key_generator
+    assert_equal expected[:key], enigma.generate_key
   end
 end
