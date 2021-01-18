@@ -1,6 +1,9 @@
 require 'time'
+require './lib/offset'
 
 class Cipher
+  # include Offset
+
   ALPHABET = ('a'..'z').to_a << ' '
 
   attr_reader :a_key,
@@ -27,6 +30,10 @@ class Cipher
     @shifts   = nil
   end
 
+  def key_generator
+    rand(9999).to_s.rjust(5, '0')
+  end
+
   def make_shifts
     @a_shift = a_key + offset[0].to_i
     @b_shift = b_key + offset[1].to_i
@@ -48,24 +55,14 @@ class Cipher
     @offset = ((date.to_i) ** 2).to_s.split('').last(4)
   end
 
-  def key_generator
-    rand(9999).to_s.rjust(5, '0')
-  end
-
   def encrypt(message, key = key_generator, date = Time.now.strftime('%d%m%y'))
     create_offset(date)
     create_keys(key)
     make_shifts
 
-    encrypted_message = message.downcase.split('').each_with_index.reduce('') do |memo, (char, index)|
-      shift_index = index % make_shifts.length
-      shift = make_shifts[shift_index]
-      character_index = ALPHABET.index(char)
-      rotated_alphabet = ALPHABET.rotate(shift)
-      new_character = rotated_alphabet[character_index]
-      memo += new_character
-    end
-    Hash[encryption: encrypted_message, key: key, date: date]
+    encrypted_message = encode(message)
+
+    {encryption: encrypted_message, key: key, date: date}
   end
 
   def decrypt(encrypted_message, key, date = Time.now.strftime('%d%m%y'))
@@ -73,14 +70,38 @@ class Cipher
     create_keys(key)
     make_shifts
 
-    decrypted_message = encrypted_message.downcase.split('').each_with_index.reduce("") do |memo, (char, index)|
-      shift_index = index % shifts.length
-      shift = -(shifts[shift_index])
-      character_index = ALPHABET.index(char)
-      rotated_alphabet = ALPHABET.rotate(shift)
-      new_character = rotated_alphabet[character_index]
+    decrypted_message = decode(encrypted_message)
+
+    {decryption: decrypted_message, key: key, date: date}
+  end
+
+  def encode(message)
+    code(message, 1)
+  end
+
+  def decode(encrypted_message)
+    code(encrypted_message, -1)
+  end
+
+  def location_of(char)
+    ALPHABET.index(char)
+  end
+
+  def shift_index(index, direction)
+    (make_shifts[index % make_shifts.length]) * direction
+  end
+
+  def rotate_alphabet(index, direction)
+    ALPHABET.rotate(shift_index(index, direction))
+  end
+
+  def code(secret_message, direction)
+    secret_message.downcase.split('').each_with_index.reduce('') do |memo, (char, index)|
+      shift_index(index, direction)
+      location_of(char)
+      scrambled_alphabet = rotate_alphabet(index, direction)
+      new_character = scrambled_alphabet[location_of(char)]
       memo += new_character
     end
-    Hash[decryption: decrypted_message, key: key, date: date]
   end
 end
