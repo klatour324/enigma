@@ -80,7 +80,7 @@ class EnigmaTest < Minitest::Test
     enigma.make_shifts(key_component.create_keys, offset.create_offsets)
 
     assert_equal 27, enigma.retrieve_shift(1, 1)
-    assert_equal -73, enigma.retrieve_shift(2, -1)
+    assert_equal (-73), enigma.retrieve_shift(2, -1)
   end
 
   def test_it_rotates_alphabet
