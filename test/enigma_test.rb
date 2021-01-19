@@ -20,40 +20,14 @@ class EnigmaTest < Minitest::Test
     assert_equal expected, enigma.encrypt('hello world', '02715', '040895')
   end
 
-  def test_it_can_create_an_offset
-    enigma = Enigma.new
-
-    enigma.create_offset('180689')
-
-    assert_equal ['4', '7', '2', '1'], enigma.offset
-  end
-
-  def test_it_can_create_keys
-    enigma = Enigma.new
-
-    enigma.create_keys('02715')
-
-    assert_equal 2, enigma.a_key
-    assert_equal 27, enigma.b_key
-    assert_equal 71, enigma.c_key
-    assert_equal 15, enigma.d_key
-  end
-
   def test_it_can_make_shifts
     enigma = Enigma.new
-    a_shift = 3
-    b_shift = 27
-    c_shift = 73
-    d_shift = 20
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_offset('040895')
-    enigma.create_keys('02715')
-    enigma.make_shifts
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
 
-    assert_equal 3, enigma.a_shift
-    assert_equal 27, enigma.b_shift
-    assert_equal 73, enigma.c_shift
-    assert_equal 20, enigma.d_shift
+    assert_equal [3, 27, 73, 20], enigma.shifts
   end
 
   def test_it_can_decrypt_a_message_with_given_key_and_date
@@ -92,7 +66,6 @@ class EnigmaTest < Minitest::Test
     assert_equal expected, enigma.decrypt('keder ohulw1', '02715', '040895')
   end
 
-
   def test_location_of_char
     enigma = Enigma.new
 
@@ -101,9 +74,10 @@ class EnigmaTest < Minitest::Test
 
   def test_it_can_retrieve_shift
     enigma = Enigma.new
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_keys('02715')
-    enigma.create_offset('040895')
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
 
     assert_equal 27, enigma.retrieve_shift(1, 1)
     assert_equal -73, enigma.retrieve_shift(2, -1)
@@ -111,9 +85,10 @@ class EnigmaTest < Minitest::Test
 
   def test_it_rotates_alphabet
     enigma = Enigma.new
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_keys('02715')
-    enigma.create_offset('040895')
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
 
     assert_equal ["d", "e", "f", "g", "h", "i",
                   "j", "k", "l","m", "n", "o",
@@ -130,23 +105,25 @@ class EnigmaTest < Minitest::Test
 
   end
 
-  def test_it_makes_code
+  def test_it_can_create_code
     enigma = Enigma.new
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_keys('02715')
-    enigma.create_offset('040895')
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
     enigma.location_of('l')
     enigma.retrieve_shift(2, 1)
     enigma.rotate_alphabet(2, 1)
 
-    assert_equal 'keder', enigma.code('hello', 1)
+    assert_equal 'keder', enigma.create_code('hello', 1)
   end
 
   def test_it_encodes_when_direction_is_positive
     enigma = Enigma.new
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_keys('02715')
-    enigma.create_offset('040895')
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
     enigma.location_of('t')
     enigma.retrieve_shift(2, 1)
     enigma.rotate_alphabet(2, 1)
@@ -154,22 +131,23 @@ class EnigmaTest < Minitest::Test
     assert_equal 'w', enigma.encode('t')
   end
 
-  def test_it_can_translate_when_direction_is_negative
+  def test_it_can_decode_when_direction_is_negative
     enigma = Enigma.new
+    offset = Offset.new('040895')
+    key_component = Key.new('02715')
 
-    enigma.create_keys('02715')
-    enigma.create_offset('040895')
+    enigma.make_shifts(key_component.create_keys, offset.create_offsets)
     enigma.location_of('a')
     enigma.retrieve_shift(2, -1)
     enigma.rotate_alphabet(2, -1)
 
-    assert_equal 'y', enigma.translate('a')
-    assert_equal 'words', enigma.translate('zojxv')
+    assert_equal 'y', enigma.decode('a')
+    assert_equal 'words', enigma.decode('zojxv')
   end
 
   def test_it_encrypts_a_message_using_todays_date
     enigma = Enigma.new
-    Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    Date.stubs(:today).returns(Date.parse('2021-01-17'))
 
     expected = {
                 encryption: 'nkfaufqdxry',
@@ -183,7 +161,7 @@ class EnigmaTest < Minitest::Test
   def test_it_decrypts_a_message_using_todays_date
     enigma = Enigma.new
 
-    Time.stubs(:now).returns(Time.parse('2021-01-17'))
+    Date.stubs(:today).returns(Date.parse('2021-01-17'))
 
     expected = {
                 decryption: 'hello world',
@@ -197,8 +175,8 @@ class EnigmaTest < Minitest::Test
   def test_it_generates_a_random_key_and_uses_todays_date
     enigma = Enigma.new
 
-    Time.stubs(:now).returns(Time.parse('2021-01-17'))
-    enigma.stubs(:rand).returns(1234)
+    Date.stubs(:today).returns(Date.parse('2021-01-17'))
+    Key.any_instance.stubs(:rand).returns(1234)
 
     expected = {
                 encryption: 'mwlttrwwwcd',
@@ -207,20 +185,5 @@ class EnigmaTest < Minitest::Test
                }
 
     assert_equal expected, enigma.encrypt('hello world')
-  end
-
-  def test_it_generates_a_key
-    enigma = Enigma.new
-
-    Time.stubs(:now).returns(Time.parse('2021-01-17'))
-    enigma.stubs(:rand).returns(1234)
-
-    expected = {
-                encryption: 'mwlttrwwwcd',
-                key: '01234',
-                date: '170121'
-               }
-
-    assert_equal expected[:key], enigma.generate_key
   end
 end
